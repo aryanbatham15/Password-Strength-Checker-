@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_PASS 200
+
+
+int checkPasswordStrength(char *password) {
+    int length = 0;
+    int hasUpper = 0, hasLower = 0, hasDigit = 0, hasSpecial = 0;
+    int score = 0;
+
+    length = strlen(password);
+
+
+    if (length > 0 && password[length - 1] == '\n') {
+        password[length - 1] = '\0';
+        length--;
+    }
+
+
+    if (length >= 8) score++;
+
+    for (int i = 0; i < length; i++) {
+        unsigned char ch = (unsigned char)password[i];
+        if (isupper(ch)) hasUpper = 1;
+        else if (islower(ch)) hasLower = 1;
+        else if (isdigit(ch)) hasDigit = 1;
+        else if (ispunct(ch)) hasSpecial = 1;
+    }
+
+    if (hasUpper) score++;
+    if (hasLower) score++;
+    if (hasDigit) score++;
+    if (hasSpecial) score++;
+
+    printf("\n--- Password Analysis ---\n");
+    printf("Length (>=8):        %s (Length = %d)\n", (length >= 8) ? "Yes" : "No", length);
+    printf("Has Uppercase:       %s\n", hasUpper ? "Yes" : "No");
+    printf("Has Lowercase:       %s\n", hasLower ? "Yes" : "No");
+    printf("Has Digit:           %s\n", hasDigit ? "Yes" : "No");
+    printf("Has Special Char:    %s\n", hasSpecial ? "Yes" : "No");
+
+    printf("\nTotal Score: %d / 5\n", score);
+    printf("Overall Strength: ");
+    if (score == 5) {
+        printf("Very Strong \n");
+    } else if (score >= 3) {
+        printf("Medium \n");
+    } else {
+        printf("Weak \n");
+    }
+
+    return score;
+}
+
+
+void suggestImprovements() {
+    printf("\n Tips to make your password strong:\n");
+    printf("1. Use at least 8 characters.\n");
+    printf("2. Mix uppercase and lowercase letters.\n");
+    printf("3. Add numbers (0-9).\n");
+    printf("4. Include special characters (!@#$%%^&*).\n");
+}
+
+int main() {
+    char password[MAX_PASS];
+    char choice[10];
+    char tryAgain[10];
+
+    do {
+        printf("Enter a password to check its strength: ");
+        if (fgets(password, sizeof(password), stdin) == NULL) {
+            printf("Error reading input.\n");
+            return 1;
+        }
+
+        int score = checkPasswordStrength(password);
+
+        printf("\nDo you want to make it strong? (y/n): ");
+        fgets(choice, sizeof(choice), stdin);
+
+        if (choice[0] == 'y' || choice[0] == 'Y') {
+            suggestImprovements();
+
+            printf("\nEnter a new (stronger) password: ");
+            if (fgets(password, sizeof(password), stdin) == NULL) {
+                printf("Error reading input.\n");
+                return 1;
+            }
+
+            checkPasswordStrength(password);
+        } else {
+            printf("\nThank you for using the Password Strength Checker!\n");
+            return 0;
+        }
+
+        printf("\nDo you want to try another password? (y/n): ");
+        fgets(tryAgain, sizeof(tryAgain), stdin);
+
+    } while (tryAgain[0] == 'y' || tryAgain[0] == 'Y');
+
+    printf("\nThank you for using the Password Strength Checker!\n");
+    return 0;
+}
